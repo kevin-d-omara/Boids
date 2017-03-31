@@ -4,13 +4,18 @@ using UnityEngine;
 
 namespace KevinDOMara.Boids2D
 {
+    /// <summary>
+    /// A simple 2D Boid controller.
+    /// 
+    /// See http://www.red3d.com/cwr/boids/ for inspiration.
+    /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class BoidController : MonoBehaviour
     {
         /// <summary>
         /// Radius for interacting with other Boids
         /// </summary>
-        public static float radius = 2f;
+        public static float radius = 5f;
 
         /// <summary>
         /// Constant speed the Boid moves with.
@@ -31,40 +36,100 @@ namespace KevinDOMara.Boids2D
 
         private void FixedUpdate()
         {
-            var steerPressure = Vector2.zero;
+            var steeringPressure = Vector2.zero;
             var flock = GetBoidsWithin(radius);
 
             // Determine new heading.
-            AvoidCollision();
-            AlignWithFlock();
-            MoveToFlock();
-            steerPressure = new Vector2(0f, -5f);
-
-            RotateByPressure(steerPressure);
+            steeringPressure += GetSeparationPressure(flock);
+            steeringPressure += GetAlignmentPressure(flock);
+            steeringPressure += GetCohesionPressure(flock);
+            RotateByPressure(steeringPressure);
 
             // Move forward.
             rigidBody.velocity = constantSpeed * Heading;
         }
 
-        private void AvoidCollision()
+
+
+        /// <summary>
+        /// Steer to avoid crowding local flockmates.
+        /// </summary>
+        /// <returns>Steering pressure from this behavior.</returns>
+        private Vector2 GetSeparationPressure(IList<BoidController> flock)
         {
             // Sum inverse distance of flock-mates
             // Convert to steer angle pressure
+
+            return Vector2.zero;
         }
 
-        private void AlignWithFlock()
+
+
+        /// <summary>
+        /// Steer toward the average heading of local flockmates.
+        /// </summary>
+        /// <returns>Steering pressure from this behavior.</returns>
+        private Vector2 GetAlignmentPressure(IList<BoidController> flock)
         {
-            // GetFlockAlignment()
-            // Calculate delta w/ self
-            // Convert to steer angle pressure
+            var averageAlignment = GetFlockAlignment(flock);
+            var deltaHeading = Vector2.Angle(Heading, averageAlignment);
+
+            // Pressure increases linearly with distance from flock's average alignment.
+            var steeringPressure = averageAlignment * deltaHeading / 10f;
+
+            return steeringPressure;
         }
 
-        private void MoveToFlock()
+        /// <summary>
+        /// Return the average alignment of flockmates.
+        /// </summary>
+        /// <param name="flock"></param>
+        /// <returns></returns>
+        private Vector2 GetFlockAlignment(IList<BoidController> flock)
         {
-            // GetFlockPosition()
-            // Calculate delta w/ self
-            // Convert to steer angle pressure
+            var averageAlignment = Vector2.zero;
+            foreach (BoidController boid in flock)
+            {
+                averageAlignment += boid.Heading;
+            }
+            return averageAlignment.normalized;
         }
+
+
+
+        /// <summary>
+        /// Steer to move toward the average position of local flockmates.
+        /// </summary>
+        /// <returns>Steering pressure from this behavior.</returns>
+        private Vector2 GetCohesionPressure(IList<BoidController> flock)
+        {
+            var averagePosition = GetFlockPosition(flock);
+            var deltaPosition = averagePosition - transform.position;
+
+            // Presure increases linearly with distance from the flock's average position.
+            return deltaPosition;
+        }
+
+        /// <summary>
+        /// Return the average position of the flock.
+        /// </summary>
+        private Vector3 GetFlockPosition(IList<BoidController> flock)
+        {
+            var averagePosition = Vector3.zero;
+            foreach (BoidController boid in flock)
+            {
+                averagePosition += boid.transform.position;
+            }
+            averagePosition /= flock.Count;
+
+            return averagePosition;
+        }
+
+
+
+
+
+
 
         /// <summary>
         /// Rotate Boid proportional to the steering pressure.
@@ -73,11 +138,11 @@ namespace KevinDOMara.Boids2D
         private void RotateByPressure(Vector2 steeringPressure)
         {
             // Prevent rotating too far.
-            var rotationDirection = Heading.RotateTo(steeringPressure);
             var deltaHeading = Vector2.Angle(Heading, steeringPressure);
+            var rotateAngle = Mathf.Clamp(steeringPressure.magnitude, 0, deltaHeading);
 
             // Rotate clockwise or counter-clockwise.
-            var rotateAngle = Mathf.Clamp(steeringPressure.magnitude, 0, deltaHeading);
+            var rotationDirection = Heading.RotateTo(steeringPressure);
             rotateAngle *= rotationDirection;
 
             transform.Rotate(new Vector3(0f, 0f, rotateAngle));
@@ -87,21 +152,6 @@ namespace KevinDOMara.Boids2D
         {
             return Vector2.zero;
         }
-
-        /// <summary>
-        /// Return the average alignment of the flock.
-        /// </summary>
-        private Vector2 GetFlockAlignment()
-        {
-            return Vector2.zero;
-        }
-
-        private Vector2 GetFlockPosition()
-        {
-            return Vector2.zero;
-        }
-
-
 
         /// <summary>
         /// Return all BoidController components within the radius.
