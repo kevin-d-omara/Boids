@@ -13,20 +13,14 @@ namespace KevinDOMara.Boids2D
         public static float radius = 2f;
 
         /// <summary>
-        /// Constant propulsion force.
+        /// Constant speed the Boid moves with.
         /// </summary>
-        public static float speed = 10f;
+        public static float constantSpeed = 10f;
 
         /// <summary>
-        /// Forward direction of Boid.
+        /// Forward direction of the Boid.
         /// </summary>
-        public Vector2 Heading
-        {
-            get
-            {
-                return transform.right;
-            }
-        }
+        public Vector2 Heading { get { return transform.right; } }
 
         private Rigidbody2D rigidBody;
 
@@ -37,17 +31,19 @@ namespace KevinDOMara.Boids2D
 
         private void FixedUpdate()
         {
-            var steerAngle = Vector2.zero;
+            var steerPressure = Vector2.zero;
+            var flock = GetBoidsWithin(radius);
 
             // Determine new heading.
             AvoidCollision();
             AlignWithFlock();
             MoveToFlock();
+            steerPressure = new Vector2(0f, -5f);
 
-            // Rotate heading by steerAngle ("pressure").
+            RotateByPressure(steerPressure);
 
             // Move forward.
-            rigidBody.velocity = speed * Heading;
+            rigidBody.velocity = constantSpeed * Heading;
         }
 
         private void AvoidCollision()
@@ -70,11 +66,31 @@ namespace KevinDOMara.Boids2D
             // Convert to steer angle pressure
         }
 
+        /// <summary>
+        /// Rotate Boid proportional to the steering pressure.
+        /// </summary>
+        /// <param name="steeringPressure">Cumulative pressure from each steering behavior.</param>
+        private void RotateByPressure(Vector2 steeringPressure)
+        {
+            // Prevent rotating too far.
+            var rotationDirection = Heading.RotateTo(steeringPressure);
+            var deltaHeading = Vector2.Angle(Heading, steeringPressure);
+
+            // Rotate clockwise or counter-clockwise.
+            var rotateAngle = Mathf.Clamp(steeringPressure.magnitude, 0, deltaHeading);
+            rotateAngle *= rotationDirection;
+
+            transform.Rotate(new Vector3(0f, 0f, rotateAngle));
+        }
+
         private Vector2 GetAvoidance()
         {
             return Vector2.zero;
         }
 
+        /// <summary>
+        /// Return the average alignment of the flock.
+        /// </summary>
         private Vector2 GetFlockAlignment()
         {
             return Vector2.zero;
