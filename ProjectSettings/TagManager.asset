@@ -43,3 +43,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Boids
+    uniqueID: 1621511287
+    locked: 0
+  - name: Obstacles
+    uniqueID: 1995823501
+    locked: 0
