@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 50467519510652408}
   - component: {fileID: 61335466907661170}
   - component: {fileID: 114994265880059900}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Boid
   m_TagString: Boid
   m_Icon: {fileID: 0}
@@ -93,7 +93,6 @@ MonoBehaviour:
   separationWeight: 0.5
   alignmentWeight: 1
   cohesionWeight: 1
-  obstacleAvoidanceWeight: 1
 --- !u!212 &212458157033386404
 SpriteRenderer:
   m_ObjectHideFlags: 1

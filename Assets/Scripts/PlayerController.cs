@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace KevinDOMara.Boids2D
 {
@@ -19,6 +20,7 @@ namespace KevinDOMara.Boids2D
 
                 // Create Boid!
                 var instance = Instantiate(boidPrefab, clickPosition, Quaternion.identity) as GameObject;
+                instance.transform.Rotate(new Vector3(0f, 0f, Random.value * 360f));
                 instance.transform.SetParent(boidHolder);
             }
         }
