@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace KevinDOMara.Boids2D
 {
@@ -54,37 +55,48 @@ namespace KevinDOMara.Boids2D
         /// <summary>
         /// Steer to avoid crowding local flockmates.
         /// </summary>
-        /// <returns>Steering pressure from this behavior.</returns>
         private Vector2 GetSeparationPressure(IList<BoidController> flock)
         {
-            // Sum inverse distance of flock-mates
-            // Convert to steer angle pressure
+            // Pressure increases with the inverse distance from flockmates.
+            var separationPressure = GetInverseDistanceTo(flock);
 
-            return Vector2.zero;
+            return separationPressure;
         }
 
+        /// <summary>
+        /// Return a summation of the inverse distance to each flockmate.
+        /// </summary>
+        private Vector3 GetInverseDistanceTo(IList<BoidController> flock)
+        {
+            var inverseDistance = Vector3.zero;
+            foreach (BoidController boid in flock)
+            {
+                var deltaPosition = transform.position - boid.transform.position;
+                if (deltaPosition.magnitude == 0) { deltaPosition = Random.onUnitSphere; }
 
+                inverseDistance += deltaPosition / deltaPosition.magnitude;
+            }
+
+            return inverseDistance;
+        }
 
         /// <summary>
         /// Steer toward the average heading of local flockmates.
         /// </summary>
-        /// <returns>Steering pressure from this behavior.</returns>
         private Vector2 GetAlignmentPressure(IList<BoidController> flock)
         {
             var averageAlignment = GetFlockAlignment(flock);
             var deltaHeading = Vector2.Angle(Heading, averageAlignment);
 
             // Pressure increases linearly with distance from flock's average alignment.
-            var steeringPressure = averageAlignment * deltaHeading / 10f;
+            var alignmentPressure = averageAlignment * deltaHeading / 10f;
 
-            return steeringPressure;
+            return alignmentPressure;
         }
 
         /// <summary>
         /// Return the average alignment of flockmates.
         /// </summary>
-        /// <param name="flock"></param>
-        /// <returns></returns>
         private Vector2 GetFlockAlignment(IList<BoidController> flock)
         {
             var averageAlignment = Vector2.zero;
@@ -95,12 +107,9 @@ namespace KevinDOMara.Boids2D
             return averageAlignment.normalized;
         }
 
-
-
         /// <summary>
         /// Steer to move toward the average position of local flockmates.
         /// </summary>
-        /// <returns>Steering pressure from this behavior.</returns>
         private Vector2 GetCohesionPressure(IList<BoidController> flock)
         {
             var averagePosition = GetFlockPosition(flock);
