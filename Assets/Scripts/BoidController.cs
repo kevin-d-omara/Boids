@@ -13,15 +13,14 @@ namespace KevinDOMara.Boids2D
     [RequireComponent(typeof(Rigidbody2D))]
     public class BoidController : MonoBehaviour
     {
-        /// <summary>
-        /// Radius for interacting with other Boids
-        /// </summary>
-        public static float radius = 5f;
+        [Header("Boid Characteristics")]
+        public float flockRadius = 5f;
+        public float constantSpeed = 5f;
 
-        /// <summary>
-        /// Constant speed the Boid moves with.
-        /// </summary>
-        public static float constantSpeed = 10f;
+        [Header("Steering Behavior")]
+        public float separationWeight = 1.0f;
+        public float alignmentWeight  = 1.0f;
+        public float cohesionWeight   = 1.0f;
 
         /// <summary>
         /// Forward direction of the Boid.
@@ -38,19 +37,17 @@ namespace KevinDOMara.Boids2D
         private void FixedUpdate()
         {
             var steeringPressure = Vector2.zero;
-            var flock = GetBoidsWithin(radius);
+            var flock = GetBoidsWithin(flockRadius);
 
             // Determine new heading.
-            steeringPressure += GetSeparationPressure(flock);
-            steeringPressure += GetAlignmentPressure(flock);
-            steeringPressure += GetCohesionPressure(flock);
+            steeringPressure += GetSeparationPressure(flock) * separationWeight;
+            steeringPressure += GetAlignmentPressure(flock)  * alignmentWeight;
+            steeringPressure += GetCohesionPressure(flock)   * cohesionWeight;
             RotateByPressure(steeringPressure);
 
             // Move forward.
             rigidBody.velocity = constantSpeed * Heading;
         }
-
-
 
         /// <summary>
         /// Steer to avoid crowding local flockmates.
@@ -85,6 +82,8 @@ namespace KevinDOMara.Boids2D
         /// </summary>
         private Vector2 GetAlignmentPressure(IList<BoidController> flock)
         {
+            if (flock.Count == 0) { return Vector2.zero; }
+
             var averageAlignment = GetFlockAlignment(flock);
             var deltaHeading = Vector2.Angle(Heading, averageAlignment);
 
@@ -112,6 +111,8 @@ namespace KevinDOMara.Boids2D
         /// </summary>
         private Vector2 GetCohesionPressure(IList<BoidController> flock)
         {
+            if (flock.Count == 0) { return Vector2.zero; }
+
             var averagePosition = GetFlockPosition(flock);
             var deltaPosition = averagePosition - transform.position;
 
@@ -124,6 +125,8 @@ namespace KevinDOMara.Boids2D
         /// </summary>
         private Vector3 GetFlockPosition(IList<BoidController> flock)
         {
+            if (flock.Count == 0) { return Vector3.zero; }
+
             var averagePosition = Vector3.zero;
             foreach (BoidController boid in flock)
             {
@@ -133,12 +136,6 @@ namespace KevinDOMara.Boids2D
 
             return averagePosition;
         }
-
-
-
-
-
-
 
         /// <summary>
         /// Rotate Boid proportional to the steering pressure.
@@ -157,17 +154,13 @@ namespace KevinDOMara.Boids2D
             transform.Rotate(new Vector3(0f, 0f, rotateAngle));
         }
 
-        private Vector2 GetAvoidance()
-        {
-            return Vector2.zero;
-        }
-
         /// <summary>
         /// Return all BoidController components within the radius.
         /// </summary>
         private IList<BoidController> GetBoidsWithin(float radius)
         {
-            var neighbors = Geometry.FindComponentsInCircle<BoidController>(transform.position, radius);
+            var neighbors = Geometry.FindComponentsInCircle<BoidController>(transform.position,
+                radius);
             neighbors.Remove(this);
 
             return neighbors;

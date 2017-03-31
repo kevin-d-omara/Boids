@@ -88,6 +88,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b8f692066b81294ea498eda3a25d9ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flockRadius: 5
+  constantSpeed: 10
+  separationWeight: 2
+  alignmentWeight: 1
+  cohesionWeight: 1
 --- !u!212 &212458157033386404
 SpriteRenderer:
   m_ObjectHideFlags: 1
