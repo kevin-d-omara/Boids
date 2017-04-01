@@ -7,8 +7,8 @@ namespace KevinDOMara.Boids2D
 {
     public class PlayerController : MonoBehaviour
     {
-        [SerializeField] private GameObject boidPrefab;
-        [SerializeField] private Transform boidHolder;
+        public delegate void RequestCreateBoid(Vector3 position);
+        public static event RequestCreateBoid OnRequestCreateBoid;
 
         private void Update()
         {
@@ -18,10 +18,10 @@ namespace KevinDOMara.Boids2D
                 clickPosition.z = 10f;
                 clickPosition = Camera.main.ScreenToWorldPoint(clickPosition);
 
-                // Create Boid!
-                var instance = Instantiate(boidPrefab, clickPosition, Quaternion.identity) as GameObject;
-                instance.transform.Rotate(new Vector3(0f, 0f, Random.value * 360f));
-                instance.transform.SetParent(boidHolder);
+                if (OnRequestCreateBoid != null)
+                {
+                    OnRequestCreateBoid(clickPosition);
+                }
             }
         }
     }

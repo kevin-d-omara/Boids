@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 namespace KevinDOMara.Boids2D
 {
     /// <summary>
-    /// A simple 2D Boid controller.
+    /// A simple 2D Boid which flocks together and moves towards some waypoint.
     /// 
     /// See http://www.red3d.com/cwr/boids/ for inspiration.
     /// </summary>
@@ -21,17 +21,38 @@ namespace KevinDOMara.Boids2D
         public float separationWeight = 1.0f;
         public float alignmentWeight  = 1.0f;
         public float cohesionWeight   = 1.0f;
+        public float waypointWeight   = 1.0f;
 
         /// <summary>
         /// Forward direction of the Boid.
         /// </summary>
         public Vector2 Heading { get { return transform.right; } }
 
+        /// <summary>
+        /// Target to move towards.
+        /// </summary>
+        private Transform waypoint;
+
         private Rigidbody2D rigidBody;
 
         private void Awake()
         {
             rigidBody = GetComponent<Rigidbody2D>();
+        }
+
+        private void Start()
+        {
+            waypoint = GameManager.Instance.Waypoint;
+        }
+
+        private void OnEnable()
+        {
+            GameManager.OnWaypointChanged += SetWaypoint;
+        }
+
+        private void OnDisable()
+        {
+            GameManager.OnWaypointChanged -= SetWaypoint;
         }
 
         private void FixedUpdate()
@@ -47,6 +68,11 @@ namespace KevinDOMara.Boids2D
 
             // Move forward.
             rigidBody.velocity = constantSpeed * Heading;
+        }
+
+        private void SetWaypoint(Transform waypoint)
+        {
+            this.waypoint = waypoint;
         }
 
         /// <summary>
