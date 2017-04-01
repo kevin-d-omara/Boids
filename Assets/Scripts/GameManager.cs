@@ -27,6 +27,7 @@ namespace KevinDOMara.Boids2D
         [Range(1, 250)]
         [SerializeField] private int flockSize;
         [SerializeField] private Vector2 boundary;
+        private List<GameObject> flock = new List<GameObject>();
 
         public Transform Waypoint
         {
@@ -45,6 +46,7 @@ namespace KevinDOMara.Boids2D
         [SerializeField] private List<Transform> Waypoints;
         private int waypointCounter = 0;
         [SerializeField] private Transform LazyWaypoint;
+        [SerializeField] private Transform Leader;
 
         [Header("Boid")]
         [SerializeField] private GameObject boidPrefab;
@@ -78,7 +80,8 @@ namespace KevinDOMara.Boids2D
                     Waypoint = Waypoints[0];
                     break;
                 case FlockMode.FollowTheLeader:
-                    throw new System.NotImplementedException();
+                    Leader.GetComponent<SpriteRenderer>().enabled = true;
+                    Waypoint = Leader;
                     break;
                 default:
                     throw new System.ArgumentException("Flocking Mode not implemented.");
@@ -112,6 +115,7 @@ namespace KevinDOMara.Boids2D
             var instance = Instantiate(boidPrefab, position, Quaternion.identity) as GameObject;
             instance.transform.Rotate(new Vector3(0f, 0f, Random.value * 360f));
             instance.transform.SetParent(boidHolder);
+            flock.Add(instance);
 
             ++BoidCount;
         }
@@ -141,7 +145,8 @@ namespace KevinDOMara.Boids2D
                     Waypoint = Waypoints[waypointCounter];
                     break;
                 case FlockMode.FollowTheLeader:
-                    throw new System.NotImplementedException();
+                    Leader.GetComponent<SpriteRenderer>().enabled = true;
+                    Waypoint = Leader;
                     break;
                 default:
                     throw new System.ArgumentException("Flocking Mode not implemented.");
