@@ -20,7 +20,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4678048006399948}
   - component: {fileID: 212341106627210442}
-  m_Layer: 0
+  - component: {fileID: 58359811836989164}
+  - component: {fileID: 114015119928430600}
+  m_Layer: 2
   m_Name: Waypoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,6 +42,36 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &58359811836989164
+CircleCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1732854337237186}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 20
+--- !u!114 &114015119928430600
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1732854337237186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5502aec90d33d9947a292231cb94ee9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  triggerThreshold: 0.75
+  radius: 20
+  boidLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!212 &212341106627210442
 SpriteRenderer:
   m_ObjectHideFlags: 1

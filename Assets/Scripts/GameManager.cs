@@ -40,6 +40,7 @@ namespace KevinDOMara.Boids2D
                 }
             }
         }
+        [Header("Waypoints")]
         private Transform _waypoint;
         [SerializeField] private List<Transform> Waypoints;
         [SerializeField] private Transform LazyWaypoint;
@@ -48,7 +49,7 @@ namespace KevinDOMara.Boids2D
         [SerializeField] private GameObject boidPrefab;
         [SerializeField] private Transform boidHolder;
 
-        private int boidCount = 0;
+        public int BoidCount { get; private set; }
 
         private void Awake()
         {
@@ -60,6 +61,8 @@ namespace KevinDOMara.Boids2D
             {
                 Destroy(this);
             }
+
+            BoidCount = 0;
 
             // Set lazy waypoint.
             LazyWaypoint.position = GetRandomPositionInBounds(boundary);
@@ -79,6 +82,7 @@ namespace KevinDOMara.Boids2D
                 default:
                     throw new System.ArgumentException("Flocking Mode not implemented.");
             }
+            Waypoint.gameObject.SetActive(true);
         }
 
         private void Start()
@@ -93,11 +97,13 @@ namespace KevinDOMara.Boids2D
         private void OnEnable()
         {
             PlayerController.OnRequestCreateBoid += CreateBoid;
+            WaypointController.OnWaypointFilled += OnWaypointFilled;
         }
 
         private void OnDisable()
         {
             PlayerController.OnRequestCreateBoid -= CreateBoid;
+            WaypointController.OnWaypointFilled -= OnWaypointFilled;
         }
 
         private void CreateBoid(Vector3 position)
@@ -106,7 +112,7 @@ namespace KevinDOMara.Boids2D
             instance.transform.Rotate(new Vector3(0f, 0f, Random.value * 360f));
             instance.transform.SetParent(boidHolder);
 
-            ++boidCount;
+            ++BoidCount;
         }
 
         private Vector3 GetRandomPositionInBounds(Vector2 boundary)
@@ -114,6 +120,11 @@ namespace KevinDOMara.Boids2D
             var x = Random.Range(-boundary.x, boundary.x);
             var y = Random.Range(-boundary.y, boundary.y);
             return new Vector3(x, y, 0f);
+        }
+
+        private void OnWaypointFilled(GameObject waypoint)
+        {
+            waypoint.SetActive(false);
         }
     }
 }
