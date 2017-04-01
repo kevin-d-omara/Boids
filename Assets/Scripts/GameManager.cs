@@ -43,6 +43,7 @@ namespace KevinDOMara.Boids2D
         [Header("Waypoints")]
         private Transform _waypoint;
         [SerializeField] private List<Transform> Waypoints;
+        private int waypointCounter = 0;
         [SerializeField] private Transform LazyWaypoint;
 
         [Header("Boid")]
@@ -125,6 +126,27 @@ namespace KevinDOMara.Boids2D
         private void OnWaypointFilled(GameObject waypoint)
         {
             waypoint.SetActive(false);
+
+            // Set waypoint.
+            switch (FlockingMode)
+            {
+                case FlockMode.LazyFlight:
+                    LazyWaypoint.gameObject.SetActive(true);
+                    LazyWaypoint.position = GetRandomPositionInBounds(boundary);
+                    Waypoint = LazyWaypoint;
+                    break;
+                case FlockMode.Waypoint:
+                    waypointCounter = (waypointCounter + 1) % Waypoints.Count;
+                    Waypoints[waypointCounter].gameObject.SetActive(true);
+                    Waypoint = Waypoints[waypointCounter];
+                    break;
+                case FlockMode.FollowTheLeader:
+                    throw new System.NotImplementedException();
+                    break;
+                default:
+                    throw new System.ArgumentException("Flocking Mode not implemented.");
+            }
+            Waypoint.gameObject.SetActive(true);
         }
     }
 }
