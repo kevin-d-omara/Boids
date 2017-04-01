@@ -17,7 +17,10 @@ namespace KevinDOMara.Boids2D
         public FlockMode FlockingMode
         {
             get { return _flockingMode; }
-            set { _flockingMode = value; }
+            set
+            {
+                _flockingMode = value;
+            }
         }
         [Header("Flock")]
         [SerializeField] private FlockMode _flockingMode;
@@ -39,6 +42,7 @@ namespace KevinDOMara.Boids2D
         }
         private Transform _waypoint;
         [SerializeField] private List<Transform> Waypoints;
+        [SerializeField] private Transform LazyWaypoint;
 
         [Header("Boid")]
         [SerializeField] private GameObject boidPrefab;
@@ -56,6 +60,25 @@ namespace KevinDOMara.Boids2D
             {
                 Destroy(this);
             }
+
+            // Set lazy waypoint.
+            LazyWaypoint.position = GetRandomPositionInBounds(boundary);
+
+            // Set waypoint.
+            switch (FlockingMode)
+            {
+                case FlockMode.LazyFlight:
+                    Waypoint = LazyWaypoint;
+                    break;
+                case FlockMode.Waypoint:
+                    Waypoint = Waypoints[0];
+                    break;
+                case FlockMode.FollowTheLeader:
+                    throw new System.NotImplementedException();
+                    break;
+                default:
+                    throw new System.ArgumentException("Flocking Mode not implemented.");
+            }
         }
 
         private void Start()
@@ -63,9 +86,7 @@ namespace KevinDOMara.Boids2D
             // Create initial flock.
             for (int i = 0; i < flockSize; ++i)
             {
-                var x = Random.Range(-boundary.x, boundary.x);
-                var y = Random.Range(-boundary.y, boundary.y);
-                CreateBoid(new Vector3(x, y, 0f));
+                CreateBoid(GetRandomPositionInBounds(boundary));
             }
         }
 
@@ -86,6 +107,13 @@ namespace KevinDOMara.Boids2D
             instance.transform.SetParent(boidHolder);
 
             ++boidCount;
+        }
+
+        private Vector3 GetRandomPositionInBounds(Vector2 boundary)
+        {
+            var x = Random.Range(-boundary.x, boundary.x);
+            var y = Random.Range(-boundary.y, boundary.y);
+            return new Vector3(x, y, 0f);
         }
     }
 }

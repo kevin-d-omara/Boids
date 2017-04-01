@@ -61,9 +61,10 @@ namespace KevinDOMara.Boids2D
             var flock = GetBoidsWithin(flockRadius);
 
             // Determine new heading.
-            steeringPressure += GetSeparationPressure(flock) * separationWeight;
-            steeringPressure += GetAlignmentPressure(flock)  * alignmentWeight;
-            steeringPressure += GetCohesionPressure(flock)   * cohesionWeight;
+            steeringPressure += GetSeparationPressure(flock)  * separationWeight;
+            steeringPressure += GetAlignmentPressure(flock)   * alignmentWeight;
+            steeringPressure += GetCohesionPressure(flock)    * cohesionWeight;
+            steeringPressure += GetWaypointPressure(waypoint) * waypointWeight;
             RotateByPressure(steeringPressure);
 
             // Move forward.
@@ -161,6 +162,17 @@ namespace KevinDOMara.Boids2D
             averagePosition /= flock.Count;
 
             return averagePosition;
+        }
+
+        /// <summary>
+        /// Steer to move toward the waypoint.
+        /// </summary>
+        private Vector2 GetWaypointPressure(Transform waypoint)
+        {
+            var deltaPosition = waypoint.position - transform.position;
+
+            // Presure increases linearly with distance from the flock's average position.
+            return deltaPosition;
         }
 
         /// <summary>

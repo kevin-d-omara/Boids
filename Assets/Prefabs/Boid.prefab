@@ -93,6 +93,7 @@ MonoBehaviour:
   separationWeight: 0.5
   alignmentWeight: 1
   cohesionWeight: 1
+  waypointWeight: 0.7
 --- !u!212 &212458157033386404
 SpriteRenderer:
   m_ObjectHideFlags: 1
