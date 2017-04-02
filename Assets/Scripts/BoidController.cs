@@ -34,11 +34,10 @@ namespace KevinDOMara.Boids3D
             var steeringPressure = Vector3.zero;
             var flock = GetBoidsWithin(flockRadius);
 
-            //steeringPressure = new Vector3(0f, 1f, 0f);
             // Determine new heading.
-            //steeringPressure += GetSeparationPressure(flock) * separationWeight;
-            steeringPressure += GetAlignmentPressure(flock) * alignmentWeight;
-            steeringPressure += GetCohesionPressure(flock) * cohesionWeight;
+            steeringPressure += GetSeparationPressure(flock) * separationWeight;
+            steeringPressure += GetAlignmentPressure(flock)  * alignmentWeight;
+            steeringPressure += GetCohesionPressure(flock)   * cohesionWeight;
             //steeringPressure += GetWaypointPressure(waypoint) * waypointWeight;
             RotateByPressure(steeringPressure);
 
@@ -58,6 +57,25 @@ namespace KevinDOMara.Boids3D
             neighbors.Remove(this);
 
             return neighbors;
+        }
+
+        /// <summary>
+        /// Steer to avoid crowding local flockmates.
+        /// </summary>
+        private Vector3 GetSeparationPressure(IList<BoidController> flock)
+        {
+            // Get sum of inverse distance to flockmates.
+            var inverseDistance = Vector3.zero;
+            foreach (BoidController boid in flock)
+            {
+                var deltaPosition = transform.position - boid.transform.position;
+                if (deltaPosition.magnitude == 0) { deltaPosition = Random.onUnitSphere; }
+
+                inverseDistance += deltaPosition / deltaPosition.magnitude;
+            }
+
+            // Pressure inversely proportional to distance from flockmates.
+            return inverseDistance;
         }
 
         /// <summary>
