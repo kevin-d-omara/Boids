@@ -837,7 +837,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e82a367ee3bf604bb0714a9bfda2685, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _flockingMode: 2
+  _flockingMode: 0
   flockSize: 20
   boundary: {x: 30, y: 17}
   Waypoints:
