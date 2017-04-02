@@ -20,7 +20,7 @@ namespace KevinDOMara.Boids3D
         /// <summary>
         /// Forward direction of the Boid.
         /// </summary>
-        public Vector3 Heading { get { return transform.up; } }
+        public Vector3 Heading { get { return transform.forward; } }
 
         private Rigidbody rigidBody;
 
@@ -34,12 +34,13 @@ namespace KevinDOMara.Boids3D
             var steeringPressure = Vector3.zero;
             var flock = GetBoidsWithin(flockRadius);
 
+            steeringPressure = new Vector3(0f, 1f, 0f);
             // Determine new heading.
             //steeringPressure += GetSeparationPressure(flock) * separationWeight;
             //steeringPressure += GetAlignmentPressure(flock) * alignmentWeight;
             //steeringPressure += GetCohesionPressure(flock) * cohesionWeight;
             //steeringPressure += GetWaypointPressure(waypoint) * waypointWeight;
-            //RotateByPressure(steeringPressure);
+            RotateByPressure(steeringPressure);
 
             // Move forward.
             rigidBody.velocity = constantSpeed * Heading;
@@ -55,6 +56,21 @@ namespace KevinDOMara.Boids3D
             neighbors.Remove(this);
 
             return neighbors;
+        }
+
+        /// <summary>
+        /// Rotate Boid proportional to the steering pressure.
+        /// </summary>
+        /// <param name="steeringPressure">Cumulative pressure from each steering behavior.</param>
+        private void RotateByPressure(Vector3 steeringPressure)
+        {
+            if (steeringPressure == Vector3.zero) { return; }
+
+            var stepSize = steeringPressure.magnitude * Mathf.Deg2Rad;
+            var finalHeading = Vector3.RotateTowards(Heading, steeringPressure, stepSize, 0.0f);
+
+            var rotation = Quaternion.LookRotation(finalHeading);
+            transform.rotation = rotation;
         }
     }
 }
