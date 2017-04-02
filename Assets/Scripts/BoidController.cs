@@ -34,16 +34,18 @@ namespace KevinDOMara.Boids3D
             var steeringPressure = Vector3.zero;
             var flock = GetBoidsWithin(flockRadius);
 
-            steeringPressure = new Vector3(0f, 1f, 0f);
+            //steeringPressure = new Vector3(0f, 1f, 0f);
             // Determine new heading.
             //steeringPressure += GetSeparationPressure(flock) * separationWeight;
-            //steeringPressure += GetAlignmentPressure(flock) * alignmentWeight;
+            steeringPressure += GetAlignmentPressure(flock) * alignmentWeight;
             //steeringPressure += GetCohesionPressure(flock) * cohesionWeight;
             //steeringPressure += GetWaypointPressure(waypoint) * waypointWeight;
             RotateByPressure(steeringPressure);
 
             // Move forward.
             rigidBody.velocity = constantSpeed * Heading;
+
+            Debug.DrawRay(transform.position, Heading * 2f);
         }
 
         /// <summary>
@@ -56,6 +58,26 @@ namespace KevinDOMara.Boids3D
             neighbors.Remove(this);
 
             return neighbors;
+        }
+
+        /// <summary>
+        /// Steer toward the average heading of local flockmates.
+        /// </summary>
+        private Vector3 GetAlignmentPressure(IList<BoidController> flock)
+        {
+            if (flock.Count == 0) { return Vector3.zero; }
+
+            // Get average flock alignment.
+            var averageAlignment = Vector3.zero;
+            foreach (BoidController boid in flock)
+            {
+                averageAlignment += boid.Heading;
+            }
+            averageAlignment = averageAlignment.normalized;
+
+            // Pressure increases linearly with distance from flock's average alignment.
+            var deltaHeading = Vector3.Angle(Heading, averageAlignment);
+            return averageAlignment * deltaHeading / 20f;
         }
 
         /// <summary>
