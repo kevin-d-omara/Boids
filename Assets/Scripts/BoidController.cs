@@ -38,7 +38,7 @@ namespace KevinDOMara.Boids3D
             // Determine new heading.
             //steeringPressure += GetSeparationPressure(flock) * separationWeight;
             steeringPressure += GetAlignmentPressure(flock) * alignmentWeight;
-            //steeringPressure += GetCohesionPressure(flock) * cohesionWeight;
+            steeringPressure += GetCohesionPressure(flock) * cohesionWeight;
             //steeringPressure += GetWaypointPressure(waypoint) * waypointWeight;
             RotateByPressure(steeringPressure);
 
@@ -75,9 +75,28 @@ namespace KevinDOMara.Boids3D
             }
             averageAlignment = averageAlignment.normalized;
 
-            // Pressure increases linearly with distance from flock's average alignment.
+            // Pressure linearly proportionaly to distance from average alignment.
             var deltaHeading = Vector3.Angle(Heading, averageAlignment);
             return averageAlignment * deltaHeading / 20f;
+        }
+
+        /// <summary>
+        /// Steer to move toward the average position of local flockmates.
+        /// </summary>
+        private Vector3 GetCohesionPressure(IList<BoidController> flock)
+        {
+            if (flock.Count == 0) { return Vector3.zero; }
+
+            // Get average flock position.
+            var averagePosition = Vector3.zero;
+            foreach (BoidController boid in flock)
+            {
+                averagePosition += boid.transform.position;
+            }
+            averagePosition /= flock.Count;
+
+            // Pressure linearly proportional to distance from average position.
+            return averagePosition - transform.position;
         }
 
         /// <summary>
