@@ -838,7 +838,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _flockingMode: 0
-  flockSize: 20
+  flockSize: 25
   boundary: {x: 30, y: 17}
   Waypoints:
   - {fileID: 1840465388}
