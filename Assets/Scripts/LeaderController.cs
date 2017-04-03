@@ -39,6 +39,7 @@ namespace KevinDOMara.Boids3D
         private void OnDisable()
         {
             meshRenderer.enabled = false;
+            rigidBody.velocity = Vector3.zero;
         }
 
         private void FixedUpdate()
