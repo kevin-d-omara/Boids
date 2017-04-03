@@ -1,26 +1,35 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace KevinDOMara.Boids3D
 {
+    /// <summary>
+    /// A simple #D Boid which flocks together and moves towards some waypoint.
+    /// 
+    /// See http://www.red3d.com/cwr/boids/ for inspiration.
+    /// </summary>
     [RequireComponent(typeof(Rigidbody))]
     public class BoidController : MonoBehaviour
     {
         [Header("Boid Characteristics")]
-        public float flockRadius = 5f;
-        public float constantSpeed = 5f;
+        [Range(1f, 25f)] public float flockRadius = 5f;
+        [Range(1f, 25f)] public float constantSpeed = 5f;
 
         [Header("Steering Behavior")]
-        public float separationWeight = 1.0f;
-        public float alignmentWeight = 1.0f;
-        public float cohesionWeight = 1.0f;
-        public float waypointWeight = 1.0f;
+        [Range(-10f, 10f)] public float separationWeight = 1.0f;
+        [Range(-10f, 10f)] public float alignmentWeight = 1.0f;
+        [Range(-10f, 10f)] public float cohesionWeight = 1.0f;
+        [Range(-10f, 10f)] public float waypointWeight = 1.0f;
 
         /// <summary>
         /// Forward direction of the Boid.
         /// </summary>
         public Vector3 Heading { get { return transform.forward; } }
+
+        [HideInInspector] [NonSerialized] public Transform waypoint;
 
         private Rigidbody rigidBody;
 
@@ -35,16 +44,16 @@ namespace KevinDOMara.Boids3D
             var flock = GetBoidsWithin(flockRadius);
 
             // Determine new heading.
-            steeringPressure += GetSeparationPressure(flock) * separationWeight;
-            steeringPressure += GetAlignmentPressure(flock)  * alignmentWeight;
-            steeringPressure += GetCohesionPressure(flock)   * cohesionWeight;
-            //steeringPressure += GetWaypointPressure(waypoint) * waypointWeight;
+            steeringPressure += GetSeparationPressure(flock)  * separationWeight;
+            steeringPressure += GetAlignmentPressure(flock)   * alignmentWeight;
+            steeringPressure += GetCohesionPressure(flock)    * cohesionWeight;
+            steeringPressure += GetWaypointPressure(waypoint) * waypointWeight;
             RotateByPressure(steeringPressure);
 
             // Move forward.
             rigidBody.velocity = constantSpeed * Heading;
 
-            Debug.DrawRay(transform.position, Heading * 2f);
+            Debug.DrawRay(transform.position, Heading);
         }
 
         /// <summary>
@@ -115,6 +124,15 @@ namespace KevinDOMara.Boids3D
 
             // Pressure linearly proportional to distance from average position.
             return averagePosition - transform.position;
+        }
+
+        /// <summary>
+        /// Steer to move toward the waypoint.
+        /// </summary>
+        private Vector3 GetWaypointPressure(Transform waypoint)
+        {
+            // Pressure linearly proportional to distance from awypoint.
+            return (waypoint.position - transform.position).normalized;
         }
 
         /// <summary>

@@ -91,7 +91,7 @@ MonoBehaviour:
   flockRadius: 5
   constantSpeed: 10
   separationWeight: 0.75
-  alignmentWeight: 0.5
+  alignmentWeight: -0.5
   cohesionWeight: 1.25
   waypointWeight: 0.2
 --- !u!212 &212458157033386404
