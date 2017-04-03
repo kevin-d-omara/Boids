@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1ab0ebdf82f79248b7c0d9e68658d0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flockRadius: 5
+  flockRadius: 3
   constantSpeed: 5
   directionalNoise: 5
   separationWeight: 0.1
