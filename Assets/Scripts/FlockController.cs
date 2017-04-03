@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 namespace KevinDOMara.Boids3D
@@ -11,6 +12,7 @@ namespace KevinDOMara.Boids3D
     {
         [Header("Flock")]
         public FlockMode flockMode = FlockMode.LazyFlight;
+        public Dropdown modeSelector;
         [Range(1, 250)] public int flockSize = 10;
         public GameObject boidPrefab;
 
@@ -22,6 +24,17 @@ namespace KevinDOMara.Boids3D
         public List<Transform> orderedWaypointLocations;
 
         private Queue<Transform> orderedWaypoints = new Queue<Transform>();
+
+        private void OnEnable()
+        {
+            modeSelector.onValueChanged.AddListener(delegate {
+                SetFlockMode((FlockMode)modeSelector.value); });
+        }
+
+        private void OnDisable()
+        {
+            modeSelector.onValueChanged.RemoveAllListeners();
+        }
 
         private void Start()
         {
@@ -38,6 +51,14 @@ namespace KevinDOMara.Boids3D
             {
                 CreateBoid(GetRandomPositionInBounds());
             }
+
+            // Populate flock mode dropdown.
+            var modes = new List<FlockMode>((FlockMode[])FlockMode.GetValues(typeof(FlockMode)));
+            foreach (FlockMode mode in modes)
+            {
+                modeSelector.AddOptions(new List<string>() { mode.ToString() });
+            }
+            modeSelector.value = (int)flockMode;
         }
 
         private void FixedUpdate()
