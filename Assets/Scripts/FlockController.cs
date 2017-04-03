@@ -19,15 +19,25 @@ namespace KevinDOMara.Boids3D
         [Header("Waypoints")]
         public Vector3 boundary = Vector3.one * 10f;
         public GameObject waypointPrefab;
+        public List<Transform> orderedWaypointLocations;
 
         private WaypointController waypoint;
+        private Queue<Transform> orderedWaypoints = new Queue<Transform>();
 
         private void Start()
         {
+            // Create set of ordered waypoints.
+            for (int i = 0; i < orderedWaypointLocations.Count; ++i)
+            {
+                orderedWaypoints.Enqueue(orderedWaypointLocations[i]);
+            }
+
             // Create waypoint.
             var instance = Instantiate(waypointPrefab, transform.position, Quaternion.identity)
                 as GameObject;
             instance.transform.SetParent(transform);
+            instance.GetComponent<MeshRenderer>().enabled = false;
+            instance.GetComponent<BoxCollider>().enabled = false;
             waypoint = instance.GetComponent<WaypointController>();
 
             // Set waypoint position
@@ -37,7 +47,9 @@ namespace KevinDOMara.Boids3D
                     waypoint.transform.position = GetRandomPositionInBounds(boundary);
                     break;
                 case FlockMode.Waypoint:
-                    throw new System.NotImplementedException();
+                    var nextWaypoint = orderedWaypoints.Dequeue();
+                    waypoint.transform.position = nextWaypoint.position;
+                    orderedWaypoints.Enqueue(nextWaypoint);
                     break;
                 case FlockMode.FollowTheLeader:
                     throw new System.NotImplementedException();
@@ -63,6 +75,9 @@ namespace KevinDOMara.Boids3D
                         waypoint.transform.position = GetRandomPositionInBounds(boundary);
                         break;
                     case FlockMode.Waypoint:
+                        var nextWaypoint = orderedWaypoints.Dequeue();
+                        waypoint.transform.position = nextWaypoint.position;
+                        orderedWaypoints.Enqueue(nextWaypoint);
                         break;
                     case FlockMode.FollowTheLeader:
                         throw new System.InvalidOperationException("This line should never be reached");
