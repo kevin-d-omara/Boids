@@ -360,7 +360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72ec13e1fa196f1499aa02873d2f9b49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flockMode: 1
+  flockMode: 0
   modeSelector: {fileID: 1931619856}
   flockSize: 50
   boidPrefab: {fileID: 1179539299989616, guid: 8faf6a51afd297e4ab2f53fc3cf1ed76, type: 2}
@@ -451,7 +451,7 @@ MonoBehaviour:
   m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
