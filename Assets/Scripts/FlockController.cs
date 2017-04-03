@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 namespace KevinDOMara.Boids3D
 {
-    public enum FlockMode { LazyFlight, Waypoint, FollowTheLeader }
+    public enum FlockMode { LazyFlight, CircleATree, FollowTheLeader }
 
     public class FlockController : MonoBehaviour
     {
@@ -111,7 +111,7 @@ namespace KevinDOMara.Boids3D
                     TurnWaypointMovementOff();
                     waypoint.transform.position = GetRandomPositionInBounds();
                     break;
-                case FlockMode.Waypoint:
+                case FlockMode.CircleATree:
                     TurnWaypointMovementOff();
                     var nextWaypoint = orderedWaypoints.Dequeue();
                     waypoint.transform.position = nextWaypoint.position;

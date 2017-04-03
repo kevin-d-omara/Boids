@@ -364,7 +364,7 @@ MonoBehaviour:
   modeSelector: {fileID: 1931619856}
   flockSize: 50
   boidPrefab: {fileID: 1179539299989616, guid: 8faf6a51afd297e4ab2f53fc3cf1ed76, type: 2}
-  boundary: {x: 10, y: 10, z: 10}
+  boundary: {x: 10, y: 10, z: 7.5}
   waypoint: {fileID: 1039922756}
   orderedWaypointLocations:
   - {fileID: 354504633}
