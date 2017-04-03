@@ -31,26 +31,7 @@ namespace KevinDOMara.Boids3D
                 orderedWaypoints.Enqueue(orderedWaypointLocations[i]);
             }
 
-            // Stop waypoint from moving.
-            ToggleWaypointMovement();
-
-            // Set waypoint position
-            switch (flockMode)
-            {
-                case FlockMode.LazyFlight:
-                    waypoint.transform.position = GetRandomPositionInBounds();
-                    break;
-                case FlockMode.Waypoint:
-                    var nextWaypoint = orderedWaypoints.Dequeue();
-                    waypoint.transform.position = nextWaypoint.position;
-                    orderedWaypoints.Enqueue(nextWaypoint);
-                    break;
-                case FlockMode.FollowTheLeader:
-                    ToggleWaypointMovement();
-                    break;
-                default:
-                    throw new System.ArgumentException("Flocking Mode not implemented.");
-            }
+            SetFlockMode(flockMode);
 
             // Create initial flock.
             for (int i = 0; i < flockSize; ++i)
@@ -63,21 +44,7 @@ namespace KevinDOMara.Boids3D
         {
             if (flockMode != FlockMode.FollowTheLeader && waypoint.IsFilled(flock.Count))
             {
-                switch (flockMode)
-                {
-                    case FlockMode.LazyFlight:
-                        waypoint.transform.position = GetRandomPositionInBounds();
-                        break;
-                    case FlockMode.Waypoint:
-                        var nextWaypoint = orderedWaypoints.Dequeue();
-                        waypoint.transform.position = nextWaypoint.position;
-                        orderedWaypoints.Enqueue(nextWaypoint);
-                        break;
-                    case FlockMode.FollowTheLeader:
-                        throw new System.InvalidOperationException("This line should never be reached");
-                    default:
-                        throw new System.ArgumentException("Flocking Mode not implemented.");
-                }
+                SetFlockMode(flockMode);
             }
         }
 
@@ -102,10 +69,39 @@ namespace KevinDOMara.Boids3D
             return new Vector3(x, y, z) + transform.position;
         }
 
-        private void ToggleWaypointMovement()
+        private void TurnWaypointMovementOn()
         {
             var leader = waypoint.GetComponent<LeaderController>();
-            leader.enabled = !leader.enabled;
+            leader.enabled = true;
+        }
+
+        private void TurnWaypointMovementOff()
+        {
+            var leader = waypoint.GetComponent<LeaderController>();
+            leader.enabled = false;
+        }
+
+        private void SetFlockMode(FlockMode mode)
+        {
+            flockMode = mode;
+            switch (mode)
+            {
+                case FlockMode.LazyFlight:
+                    TurnWaypointMovementOff();
+                    waypoint.transform.position = GetRandomPositionInBounds();
+                    break;
+                case FlockMode.Waypoint:
+                    TurnWaypointMovementOff();
+                    var nextWaypoint = orderedWaypoints.Dequeue();
+                    waypoint.transform.position = nextWaypoint.position;
+                    orderedWaypoints.Enqueue(nextWaypoint);
+                    break;
+                case FlockMode.FollowTheLeader:
+                    TurnWaypointMovementOn();
+                    break;
+                default:
+                    throw new System.ArgumentException("Flocking Mode not implemented.");
+            }
         }
     }
 }
