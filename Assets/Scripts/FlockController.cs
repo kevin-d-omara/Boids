@@ -18,10 +18,9 @@ namespace KevinDOMara.Boids3D
 
         [Header("Waypoints")]
         public Vector3 boundary = Vector3.one * 10f;
-        public GameObject waypointPrefab;
+        public WaypointController waypoint;
         public List<Transform> orderedWaypointLocations;
 
-        private WaypointController waypoint;
         private Queue<Transform> orderedWaypoints = new Queue<Transform>();
 
         private void Start()
@@ -32,19 +31,14 @@ namespace KevinDOMara.Boids3D
                 orderedWaypoints.Enqueue(orderedWaypointLocations[i]);
             }
 
-            // Create waypoint.
-            var instance = Instantiate(waypointPrefab, transform.position, Quaternion.identity)
-                as GameObject;
-            instance.transform.SetParent(transform);
-            instance.GetComponent<MeshRenderer>().enabled = false;
-            instance.GetComponent<BoxCollider>().enabled = false;
-            waypoint = instance.GetComponent<WaypointController>();
+            // Stop waypoint from moving.
+            ToggleWaypointMovement();
 
             // Set waypoint position
             switch (flockMode)
             {
                 case FlockMode.LazyFlight:
-                    waypoint.transform.position = GetRandomPositionInBounds(boundary);
+                    waypoint.transform.position = GetRandomPositionInBounds();
                     break;
                 case FlockMode.Waypoint:
                     var nextWaypoint = orderedWaypoints.Dequeue();
@@ -52,7 +46,7 @@ namespace KevinDOMara.Boids3D
                     orderedWaypoints.Enqueue(nextWaypoint);
                     break;
                 case FlockMode.FollowTheLeader:
-                    throw new System.NotImplementedException();
+                    ToggleWaypointMovement();
                     break;
                 default:
                     throw new System.ArgumentException("Flocking Mode not implemented.");
@@ -61,7 +55,7 @@ namespace KevinDOMara.Boids3D
             // Create initial flock.
             for (int i = 0; i < flockSize; ++i)
             {
-                CreateBoid(GetRandomPositionInBounds(boundary));
+                CreateBoid(GetRandomPositionInBounds());
             }
         }
 
@@ -72,7 +66,7 @@ namespace KevinDOMara.Boids3D
                 switch (flockMode)
                 {
                     case FlockMode.LazyFlight:
-                        waypoint.transform.position = GetRandomPositionInBounds(boundary);
+                        waypoint.transform.position = GetRandomPositionInBounds();
                         break;
                     case FlockMode.Waypoint:
                         var nextWaypoint = orderedWaypoints.Dequeue();
@@ -97,12 +91,21 @@ namespace KevinDOMara.Boids3D
             instance.GetComponent<BoidController>().waypoint = waypoint.transform;
         }
 
-        private Vector3 GetRandomPositionInBounds(Vector3 boundary)
+        /// <summary>
+        /// Return a point within the bounds of the flock.
+        /// </summary>
+        public Vector3 GetRandomPositionInBounds()
         {
             var x = Random.Range(-boundary.x, boundary.x);
             var y = Random.Range(-boundary.y, boundary.y);
             var z = Random.Range(-boundary.z, boundary.z);
             return new Vector3(x, y, z) + transform.position;
+        }
+
+        private void ToggleWaypointMovement()
+        {
+            var leader = waypoint.GetComponent<LeaderController>();
+            leader.enabled = !leader.enabled;
         }
     }
 }
