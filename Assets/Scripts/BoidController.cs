@@ -17,6 +17,7 @@ namespace KevinDOMara.Boids3D
         [Header("Boid Characteristics")]
         [Range(1f, 25f)] public float flockRadius = 5f;
         [Range(1f, 25f)] public float constantSpeed = 5f;
+        [Range(0f, 5f)]  public float directionalNoise = 0.1f;
 
         [Header("Steering Behavior")]
         [Range(-10f, 10f)] public float separationWeight = 1.0f;
@@ -44,6 +45,7 @@ namespace KevinDOMara.Boids3D
             var flock = GetBoidsWithin(flockRadius);
 
             // Determine new heading.
+            steeringPressure += Random.insideUnitSphere * directionalNoise;
             steeringPressure += GetSeparationPressure(flock)  * separationWeight;
             steeringPressure += GetAlignmentPressure(flock)   * alignmentWeight;
             steeringPressure += GetCohesionPressure(flock)    * cohesionWeight;

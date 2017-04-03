@@ -110,6 +110,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flockRadius: 5
   constantSpeed: 5
+  directionalNoise: 5
   separationWeight: 0.1
   alignmentWeight: -0.75
   cohesionWeight: 1.5
